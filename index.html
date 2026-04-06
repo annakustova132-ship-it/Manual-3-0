@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exchange Desk Bot — Полное руководство</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #f0f4fa;
+  --bg-card:      #ffffff;
+  --bg-section:   #e8eef7;
+  --text:         #111827;
+  --text-muted:   #4b5563;
+  --text-light:   #9ca3af;
+  --border:       #dde4ef;
+  --accent:       #2563eb;
+  --accent-light: #eff6ff;
+  --accent-mid:   #bfdbfe;
+  --accent-dark:  #1d4ed8;
+  --red:          #dc2626;
+  --red-light:    #fef2f2;
+  --green:        #16a34a;
+  --green-light:  #f0fdf4;
+  --yellow:       #d97706;
+  --yellow-light: #fffbeb;
+  --purple:       #7c3aed;
+  --purple-light: #faf5ff;
+  --tg-bg:        #17212b;
+  --tg-msg:       #232e3c;
+  --tg-user:      #2b5278;
+  --tg-blue:      #5ba8dc;
+  --tg-green:     #4ecb6e;
+  --tg-red:       #f07070;
+  --tg-yellow:    #f0c040;
+  --tg-muted:     #6d8099;
+  --tg-text:      #d4d4d4;
+  --tg-border:    #2b3a4a;
+  --tg-kbd:       #232e3c;
+  --tg-kbd-border:#3a4f63;
+  --radius:       14px;
+  --radius-sm:    8px;
+  --shadow:       0 1px 8px rgba(37,99,235,0.07);
+  --shadow-card:  0 4px 20px rgba(37,99,235,0.10);
+}
+
+html { font-size: 15px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* ══════════ HERO ══════════ */
+.hero {
+  position: relative; height: 180px; overflow: hidden; background: #111827;
+}
+.hero-svg { width: 100%; height: 100%; display: block; }
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 20%, rgba(17,24,39,0.92) 100%);
+}
+.hero-content {
+  position: absolute; bottom: 18px; left: 0; right: 0;
+  text-align: center; padding: 0 16px;
+}
+.hero-title {
+  color: #fff; font-size: clamp(16px,5vw,24px); font-weight: 700;
+  letter-spacing: -0.02em; text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  margin-bottom: 5px;
+}
+.hero-sub { color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 400; }
+
+/* ══════════ WRAPPER ══════════ */
+.wrapper { max-width: 680px; margin: 0 auto; padding: 0 14px 72px; }
+
+/* ══════════ META BAR ══════════ */
+.meta-bar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 12px 0 16px; border-bottom: 1px solid var(--border);
+  margin-bottom: 22px; flex-wrap: wrap;
+}
+.meta-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10.5px; color: var(--text-muted);
+  background: var(--bg-card); border: 1px solid var(--border);
+  padding: 3px 9px; border-radius: 20px; font-weight: 500;
+}
+.meta-link {
+  margin-left: auto; font-size: 12px; color: var(--accent);
+  text-decoration: none; font-weight: 600;
+  display: flex; align-items: center; gap: 3px; white-space: nowrap;
+}
+.meta-link:hover { text-decoration: underline; }
+
+/* ══════════ CHAPTER ══════════ */
+.chapter { margin-bottom: 28px; }
+.chapter-header {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 12px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--border); position: relative;
+}
+.chapter-header::after {
+  content: ''; position: absolute; left: 0; bottom: -2px;
+  width: 32px; height: 2px; background: var(--accent); border-radius: 2px;
+}
+.chapter-num {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent); flex-shrink: 0;
+}
+.chapter-title { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+
+/* ══════════ SECTION ROWS ══════════ */
+.section-group { margin-bottom: 8px; }
+.section-main {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0 8px; border-bottom: 1px solid var(--border);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.section-main:active { background: var(--accent-light); margin: 0 -14px; padding-left: 14px; padding-right: 14px; border-radius: 4px; }
+.section-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0; margin-top: 1px;
+}
+.section-row-link {
+  flex: 1; font-size: 14px; font-weight: 600; color: var(--text);
+  text-decoration: none; transition: color 0.15s;
+}
+.section-row-link:active { color: var(--accent); }
+.section-arrow { color: var(--accent-mid); font-size: 16px; flex-shrink: 0; }
+.sub-list { padding: 4px 0 6px 18px; list-style: none; border-bottom: 1px solid var(--border); }
+.sub-list:last-child { border-bottom: none; }
+.sub-item { padding: 5px 0; }
+.sub-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--text-light); display: inline-block;
+  vertical-align: middle; margin-right: 7px; margin-top: -1px;
+}
+.sub-row-link {
+  font-size: 13px; color: var(--text-muted);
+  text-decoration: none; transition: color 0.15s;
+  display: inline-block; padding: 1px 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.sub-row-link:active { color: var(--accent); }
+
+/* ══════════ SECTION PAGE ══════════ */
+.section-page { display: none; animation: fadeIn 0.22s ease; }
+.section-page.active { display: block; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════ BACK NAV ══════════ */
+.back-nav {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 0 16px; border-bottom: 1px solid var(--border);
+  margin-bottom: 20px; cursor: pointer;
+}
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--accent);
+  background: var(--accent-light); border: 1px solid var(--accent-mid);
+  border-radius: 20px; padding: 7px 16px;
+  text-decoration: none; cursor: pointer; transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent; min-height: 38px;
+}
+.back-btn:active { background: var(--accent-mid); }
+.page-title {
+  font-size: 19px; font-weight: 700; letter-spacing: -0.02em;
+  margin-bottom: 18px; color: var(--text);
+  padding-bottom: 10px; border-bottom: 2px solid var(--border);
+  position: relative;
+}
+.page-title::after {
+  content: ''; position: absolute; left: 0; bottom: -2px;
+  width: 28px; height: 2px; background: var(--accent); border-radius: 2px;
+}
+.page-num {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 4px; display: block;
+}
+
+/* ══════════ CROSS-PAIR HIGHLIGHT ══════════ */
+.cross-pair-block {
+  margin: 16px 0;
+  border-radius: var(--radius);
+  border: 2px solid #1e40af;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a2d4a 100%);
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(37,99,235,0.22);
+}
+.cross-pair-block-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: rgba(37,99,235,0.25);
+  border-bottom: 1px solid rgba(96,165,250,0.25);
+}
+.cross-pair-block-icon { font-size: 16px; flex-shrink: 0; }
+.cross-pair-block-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #93c5fd;
+}
+.cross-pair-block-body { padding: 12px 14px; }
+.cross-pair-formula {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin-bottom: 12px; flex-wrap: wrap;
+}
+.cpf-item {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 14px;
+  border-radius: 10px;
+}
+.cpf-item.traded { background: rgba(74,222,128,0.15); border: 1.5px solid rgba(74,222,128,0.35); }
+.cpf-item.base   { background: rgba(96,165,250,0.15); border: 1.5px solid rgba(96,165,250,0.35); }
+.cpf-label { font-size: 9px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 3px; }
+.cpf-item.traded .cpf-label { color: #4ade80; }
+.cpf-item.base   .cpf-label { color: #60a5fa; }
+.cpf-value { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; }
+.cpf-item.traded .cpf-value { color: #86efac; }
+.cpf-item.base   .cpf-value { color: #93c5fd; }
+.cpf-sep {
+  font-family: 'IBM Plex Mono', monospace; font-size: 22px;
+  color: rgba(148,163,184,0.5); padding: 0 6px; align-self: center;
+}
+.cross-pair-example {
+  background: rgba(0,0,0,0.3); border-radius: 8px;
+  padding: 9px 12px; text-align: center;
+}
+.cross-pair-example code {
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+  color: #fde68a; background: none; padding: 0; border: none;
+}
+.cross-pair-example p {
+  font-size: 12px; color: #94a3b8; margin-top: 5px; line-height: 1.5;
+}
+.cross-pair-example strong { color: #e2e8f0; }
+.cross-pair-definition {
+  font-size: 12.5px; color: #94a3b8; line-height: 1.55;
+  margin-bottom: 10px;
+}
+.cross-pair-definition strong { color: #cbd5e1; }
+
+/* ══════════ BOT PHONE MOCKUP ══════════ */
+.bot-wrap { display: flex; justify-content: center; margin: 20px 0; }
+.bot-phone {
+  width: 100%; max-width: 320px; background: var(--tg-bg);
+  border-radius: 18px; padding: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+.bot-topbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px 10px; border-bottom: 1px solid var(--tg-border);
+}
+.bot-avatar {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.bot-name { font-size: 13px; font-weight: 700; color: #e8e8e8; }
+.bot-status { font-size: 11px; color: var(--tg-blue); }
+.bot-chat {
+  padding: 8px 4px 4px; display: flex; flex-direction: column; gap: 6px; min-height: 60px;
+}
+.msg-bot {
+  align-self: flex-start; max-width: 94%;
+  background: var(--tg-msg); border-radius: 4px 12px 12px 12px;
+  padding: 8px 10px; font-size: 12px; line-height: 1.5; color: var(--tg-text);
+}
+.msg-user {
+  align-self: flex-end; max-width: 85%;
+  background: var(--tg-user); border-radius: 12px 4px 12px 12px;
+  padding: 7px 10px; font-size: 12px; line-height: 1.5; color: #e0e0e0;
+}
+.msg-time { font-size: 10px; color: var(--tg-muted); margin-top: 3px; text-align: right; }
+.msg-sender { font-size: 11px; font-weight: 700; color: var(--tg-blue); margin-bottom: 3px; }
+.bot-divider { border: none; border-top: 1px solid var(--tg-border); margin: 5px 0; }
+.bot-kbd { display: grid; gap: 5px; padding: 6px 0 0; }
+.bot-kbd-row { display: flex; gap: 5px; }
+.kbd-btn {
+  flex: 1; text-align: center;
+  background: var(--tg-kbd); border: 1px solid var(--tg-kbd-border);
+  border-radius: 8px; padding: 7px 4px;
+  font-size: 11px; font-weight: 500; color: #c8d8e8; cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+.kbd-btn.green  { border-color: #29a843; color: var(--tg-green); }
+.kbd-btn.red    { border-color: #e53935; color: var(--tg-red); }
+.kbd-btn.blue   { border-color: var(--tg-blue); color: #80c8f0; }
+.kbd-btn.full   { flex: 0 0 100%; }
+.kbd-btn.accent { background: #1c3f60; border-color: var(--tg-blue); color: #90d0ff; }
+.tg-bold   { font-weight: 700; color: #e8e8e8; }
+.tg-green  { color: var(--tg-green); }
+.tg-red    { color: var(--tg-red); }
+.tg-yellow { color: var(--tg-yellow); }
+.tg-muted  { color: var(--tg-muted); font-size: 10px; }
+.tg-code   { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; background: #1a2533; border-radius: 3px; padding: 1px 4px; color: #90d0ff; }
+.tg-row    { line-height: 1.6; }
+
+/* ══════════ NAV BUTTONS ══════════ */
+.section-nav {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border);
+}
+.nav-btn {
+  flex: 1; min-width: 120px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 13px; font-weight: 600; padding: 12px 16px; border-radius: 12px;
+  border: 1.5px solid var(--border); background: var(--bg-card);
+  color: var(--text-muted); cursor: pointer; text-decoration: none;
+  transition: all 0.15s; font-family: 'IBM Plex Sans', sans-serif;
+  min-height: 46px; -webkit-tap-highlight-color: transparent;
+}
+.nav-btn:active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.nav-btn.primary {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+.nav-btn.primary:active { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+
+/* ══════════ MENU PATH (button-style) ══════════ */
+.menu-path {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px;
+  margin: 10px 0 14px; padding: 2px 0;
+}
+.mp-btn {
+  display: inline-flex; align-items: center;
+  background: var(--bg-card); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 5px 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px; font-weight: 600; color: var(--text);
+  box-shadow: 0 1px 3px rgba(37,99,235,0.08);
+  white-space: nowrap;
+}
+.mp-btn.active {
+  background: var(--accent-light); border-color: var(--accent);
+  color: var(--accent); box-shadow: 0 1px 4px rgba(37,99,235,0.18);
+}
+.mp-sep {
+  color: var(--accent-mid); font-size: 14px; font-weight: 700;
+  flex-shrink: 0; line-height: 1; padding: 0 1px;
+}
+/* Legacy menu-path support for inner text */
+.menu-path .arrow { color: var(--accent-mid); }
+.menu-path strong { color: var(--accent); font-weight: 600; }
+
+/* ══════════ ALERTS / CALLOUTS ══════════ */
+.alert {
+  display: flex; gap: 10px; padding: 11px 14px; border-radius: var(--radius-sm);
+  margin: 14px 0; font-size: 13px; line-height: 1.55;
+}
+.alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.alert.tip    { background: var(--green-light);  border-left: 3px solid var(--green);  color: #14532d; }
+.alert.note   { background: var(--accent-light); border-left: 3px solid var(--accent); color: #1e3a8a; }
+.alert.warn   { background: var(--yellow-light); border-left: 3px solid var(--yellow); color: #78350f; }
+.alert.danger { background: var(--red-light);    border-left: 3px solid var(--red);    color: #7f1d1d; }
+.alert.important { background: var(--purple-light); border-left: 3px solid var(--purple); color: #4c1d95; }
+
+/* ══════════ TABLES ══════════ */
+.tbl-wrap {
+  overflow-x: auto; margin: 14px 0; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+}
+table { width: 100%; border-collapse: collapse; background: var(--bg-card); }
+th {
+  background: linear-gradient(135deg, #1a2535, #243042);
+  color: #e5e7eb; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 10px 12px; text-align: left;
+}
+td { padding: 9px 12px; font-size: 13px; border-top: 1px solid var(--border); color: var(--text-muted); vertical-align: top; }
+tbody tr:nth-child(even) { background: #fafbff; }
+tbody tr:hover { background: var(--accent-light); }
+tr:first-child td { border-top: none; }
+
+/* ══════════ STEPS ══════════ */
+.steps { counter-reset: step; list-style: none; margin: 12px 0; padding: 0; }
+.steps li {
+  display: flex; gap: 12px; padding: 10px 0;
+  border-bottom: 1px solid var(--border); align-items: flex-start; font-size: 13px;
+}
+.steps li:last-child { border-bottom: none; }
+.steps li::before {
+  counter-increment: step; content: counter(step);
+  min-width: 26px; height: 26px;
+  background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 700; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+
+/* ══════════ STEP BLOCKS (v6-style) ══════════ */
+.step-list { margin: 14px 0; display: flex; flex-direction: column; gap: 0; }
+.step-item {
+  display: flex; gap: 16px; padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.step-item:last-child { border-bottom: none; }
+.step-num {
+  flex-shrink: 0; width: 28px; height: 28px;
+  background: var(--accent); color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; margin-top: 1px;
+}
+.step-body h4 {
+  font-size: 13.5px; font-weight: 700; color: var(--text);
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.step-body p { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+.step-body p:last-child { margin-bottom: 0; }
+
+/* ══════════ MENU PATH ══════════ */
+.menu-path {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 3px;
+  background: var(--bg-section); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; color: var(--text); margin: 6px 0;
+}
+.menu-path .arrow { color: var(--accent-mid); }
+.menu-path strong { color: var(--accent); font-weight: 600; }
+
+/* ══════════ MOCK BTN ══════════ */
+.mock-btn {
+  display: inline-block; background: var(--bg-section); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 2px 11px;
+  font-size: 12px; font-weight: 600; color: var(--text); margin: 2px 2px;
+}
+.mock-btn.green { border-color: var(--green); color: var(--green); background: var(--green-light); }
+.mock-btn.red   { border-color: var(--red);   color: var(--red);   background: var(--red-light); }
+.mock-btn.blue  { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+/* ══════════ STATUS BADGES ══════════ */
+.status {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+.status.new     { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+.status.confirm { background: var(--green-light); color: var(--green); border: 1px solid #86efac; }
+.status.done    { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-mid); }
+.status.cancel  { background: var(--red-light); color: var(--red); border: 1px solid #fca5a5; }
+
+/* Status cards */
+.status-cards { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 8px; margin: 14px 0; }
+.status-card {
+  border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+  background: var(--bg-card); overflow: hidden;
+}
+.status-card-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; font-weight: 700; font-size: 14px; color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.status-card-body { padding: 10px 12px; font-size: 12.5px; color: var(--text-muted); }
+.status-card-body p { margin-bottom: 6px; }
+.status-when { color: var(--text-light); font-size: 11.5px; margin-bottom: 4px !important; }
+.status-transitions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.st-label { font-size: 11px; font-weight: 600; color: var(--text-light); align-self: center; }
+.st-tag {
+  background: var(--accent-light); color: var(--accent);
+  border: 1px solid var(--accent-mid); border-radius: 20px;
+  padding: 1px 8px; font-size: 11px; font-weight: 600;
+}
+.status-card.status-new .status-card-head    { background: #f9fafb; }
+.status-card.status-confirmed .status-card-head { background: var(--green-light); }
+.status-card.status-done .status-card-head   { background: var(--accent-light); }
+.status-card.status-cancelled .status-card-head { background: var(--red-light); }
+
+/* ══════════ ROLE CARDS ══════════ */
+.role-cards { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 8px; margin: 12px 0; }
+.role-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow);
+}
+.role-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.role-card-sub { font-size: 11px; color: var(--text-muted); }
+.role-card-body { display: flex; flex-direction: column; gap: 5px; }
+.role-row { display: flex; gap: 7px; font-size: 12.5px; align-items: flex-start; }
+.role-icon { flex-shrink: 0; font-weight: 700; margin-top: 1px; }
+.role-can  .role-icon { color: var(--green); }
+.role-cant .role-icon { color: var(--red); }
+.role-can  { color: var(--text-muted); }
+.role-cant { color: var(--text-light); }
+
+/* Small role grid */
+.role-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+  gap: 8px; margin: 12px 0;
+}
+.role-grid-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 10px; box-shadow: var(--shadow);
+}
+.role-icon-big  { font-size: 20px; margin-bottom: 6px; }
+.role-name  { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.role-desc  { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; }
+
+/* ══════════ BADGES ══════════ */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 700;
+}
+.badge-owner    { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.badge-admin    { background: var(--accent-light); color: var(--accent-dark); border: 1px solid var(--accent-mid); }
+.badge-operator { background: var(--green-light); color: #166534; border: 1px solid #86efac; }
+.badge-user     { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+
+/* ══════════ RIGHTS GRID ══════════ */
+.rights-grid {
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  overflow: hidden; margin: 14px 0;
+}
+.rights-header, .rg-row {
+  display: grid; grid-template-columns: 1fr 52px 52px 52px 52px;
+}
+.rights-header {
+  background: linear-gradient(135deg, #1a2535, #243042); padding: 8px 0;
+}
+.rg-func {
+  padding: 8px 12px; font-size: 12px; color: var(--text-muted);
+  border-top: 1px solid var(--border); line-height: 1.4;
+}
+.rights-header .rg-func { font-size: 11px; font-weight: 700; color: #e5e7eb; text-transform: uppercase; letter-spacing: 0.07em; border: none; }
+.rg-role {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; border-top: 1px solid var(--border); border-left: 1px solid var(--border);
+}
+.rights-header .rg-role { border: none; border-left: 1px solid rgba(255,255,255,0.07); }
+.rg-yes { color: var(--green); font-weight: 700; }
+.rg-no  { color: var(--text-light); }
+.rg-row:nth-child(even) { background: #fafbff; }
+
+/* ══════════ ACTION CARDS ══════════ */
+.action-cards { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 8px; margin: 14px 0; }
+.action-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow);
+}
+.action-card-btn { margin-bottom: 6px; }
+.action-card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.action-card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+/* ══════════ FEATURE GRID ══════════ */
+.feat-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+  gap: 8px; margin: 12px 0;
+}
+.feat-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow);
+}
+.feat-icon  { font-size: 22px; margin-bottom: 6px; }
+.feat-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.feat-text  { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
+
+/* ══════════ RECALC CARDS ══════════ */
+.recalc-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.recalc-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px;
+}
+.recalc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; }
+.recalc-rule { font-size: 12.5px; color: var(--text); line-height: 1.5; }
+
+/* ══════════ FAQ ACCORDION ══════════ */
+.faq-group { margin-bottom: 24px; }
+.faq-group-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.faq-item {
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  margin-bottom: 6px; background: var(--bg-card); overflow: hidden;
+}
+.faq-question {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; cursor: pointer;
+  font-size: 13.5px; font-weight: 500; color: var(--text);
+  gap: 10px; user-select: none; transition: background 0.15s;
+}
+.faq-question:hover { background: var(--bg-section); }
+.faq-chevron { width: 18px; height: 18px; flex-shrink: 0; color: var(--accent); transition: transform 0.2s; }
+.faq-item.open .faq-chevron { transform: rotate(90deg); }
+.faq-answer {
+  display: none; padding: 0 14px 14px;
+  font-size: 13px; color: var(--text-muted); line-height: 1.65;
+  border-top: 1px solid var(--border);
+}
+.faq-item.open .faq-answer { display: block; padding-top: 10px; }
+.faq-answer p { margin-bottom: 8px; }
+.faq-answer p:last-child { margin-bottom: 0; }
+.faq-answer ol, .faq-answer ul { margin: 6px 0 8px 18px; }
+.faq-answer li { margin-bottom: 3px; font-size: 13px; }
+.faq-answer code {
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  background: var(--bg-section); padding: 1px 5px; border-radius: 4px; color: var(--accent);
+}
+
+/* ══════════ GLOSSARY ══════════ */
+.glossary-list { display: flex; flex-direction: column; gap: 0; }
+.glossary-item {
+  display: grid; grid-template-columns: 1fr 2fr;
+  padding: 10px 0; border-bottom: 1px solid var(--border); gap: 12px; font-size: 13px;
+}
+.glossary-item:last-child { border-bottom: none; }
+.glossary-term { font-weight: 600; color: var(--text); }
+.glossary-def  { color: var(--text-muted); }
+
+/* ══════════ SUPPORT ══════════ */
+.support-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-card);
+  margin-bottom: 10px; box-shadow: var(--shadow);
+}
+.support-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--accent-light); border: 1px solid var(--accent-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.support-label { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+.support-value { font-size: 14px; font-weight: 600; color: var(--accent); }
+
+/* ══════════ CODE BLOCK ══════════ */
+.code-block {
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  background: var(--bg-section); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  color: var(--text); margin: 8px 0; line-height: 1.7; overflow-x: auto;
+}
+.code-good { color: var(--green); }
+.code-bad  { color: var(--red); }
+pre {
+  background: #1e2433; color: #cdd6f4; border-radius: var(--radius-sm);
+  padding: 14px 16px; overflow-x: auto; margin: 12px 0;
+  font-size: 12px; line-height: 1.6;
+  font-family: 'IBM Plex Mono', monospace; border: 1px solid #2a3248;
+}
+pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+code {
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  background: var(--bg-section); padding: 1px 5px; border-radius: 4px; color: var(--accent);
+}
+
+/* ══════════ CARD ══════════ */
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  margin: 10px 0; box-shadow: var(--shadow);
+  font-size: 13.5px; color: var(--text-muted); line-height: 1.65;
+}
+.card strong { color: var(--text); }
+
+/* ══════════ BODY TEXT / HEADERS ══════════ */
+.body-text { font-size: 13.5px; color: var(--text-muted); line-height: 1.7; margin-bottom: 12px; }
+.body-text strong { color: var(--text); }
+h3.sub-head { font-size: 15px; font-weight: 700; color: var(--text); margin: 20px 0 10px; }
+
+/* ══════════ TIPS ROW ══════════ */
+.tips-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+
+/* ══════════ FOOTER ══════════ */
+.footer {
+  text-align: center; padding: 24px 0 0;
+  border-top: 1px solid var(--border);
+  font-size: 11.5px; color: var(--text-light);
+}
+
+/* ══════════ MOBILE-FIRST COMPREHENSIVE ══════════ */
+@media (max-width: 600px) {
+  .hero { height: 155px; }
+  .wrapper { padding: 0 12px 72px; }
+  .chapter-title { font-size: 16px; }
+  .meta-link { margin-left: 0; width: 100%; justify-content: center; }
+  .role-grid { grid-template-columns: 1fr 1fr; }
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+  .glossary-item { grid-template-columns: 1fr; gap: 2px; }
+  .rights-header, .rg-row { grid-template-columns: 1fr 40px 40px 40px 40px; }
+  .recalc-cards { grid-template-columns: 1fr; }
+  .role-cards { grid-template-columns: 1fr; }
+  .status-cards { grid-template-columns: 1fr; }
+  .action-cards { grid-template-columns: 1fr; }
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+  .tbl-wrap { margin: 10px -2px; }
+  td, th { padding: 8px 10px; font-size: 12px; }
+  pre { font-size: 11px; padding: 10px 12px; }
+  .bot-phone { max-width: 100%; }
+  .steps li { font-size: 12.5px; }
+  .body-text { font-size: 13px; }
+  h3.sub-head { font-size: 14px; margin: 16px 0 8px; }
+  .cross-pair-formula { gap: 2px; }
+  .cpf-item { padding: 7px 10px; }
+  .cpf-value { font-size: 13px; }
+  .page-title { font-size: 17px; }
+  .mp-btn { font-size: 10.5px; padding: 5px 9px; }
+  .section-nav { gap: 6px; }
+  .nav-btn { font-size: 12.5px; padding: 11px 12px; min-height: 44px; }
+  .faq-question { font-size: 13px; padding: 11px 12px; }
+  .glossary-list .glossary-term { font-size: 13px; }
+  .rights-header .rg-func { font-size: 10px; }
+  .rg-func { font-size: 11.5px; padding: 7px 10px; }
+}
+
+/* Tablet */
+@media (max-width: 768px) and (min-width: 601px) {
+  .wrapper { padding: 0 16px 64px; }
+  .status-cards { grid-template-columns: 1fr 1fr; }
+  .role-cards { grid-template-columns: 1fr 1fr; }
+}
+
+/* Ensure touch targets */
+@media (hover: none) {
+  .section-row-link:hover { color: inherit; }
+  .sub-row-link:hover { color: inherit; }
+  .nav-btn:hover { border-color: var(--border); color: var(--text-muted); background: var(--bg-card); }
+  .nav-btn.primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .back-btn:hover { background: var(--accent-light); }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <svg class="hero-svg" viewBox="0 0 800 210" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <rect width="800" height="210" fill="#111827"/>
+    <g stroke="#1e293b" stroke-width="1" opacity="0.9">
+      <line x1="0" y1="42" x2="800" y2="42"/><line x1="0" y1="84" x2="800" y2="84"/>
+      <line x1="0" y1="126" x2="800" y2="126"/><line x1="0" y1="168" x2="800" y2="168"/>
+      <line x1="100" y1="0" x2="100" y2="210"/><line x1="200" y1="0" x2="200" y2="210"/>
+      <line x1="300" y1="0" x2="300" y2="210"/><line x1="400" y1="0" x2="400" y2="210"/>
+      <line x1="500" y1="0" x2="500" y2="210"/><line x1="600" y1="0" x2="600" y2="210"/>
+      <line x1="700" y1="0" x2="700" y2="210"/>
+    </g>
+    <rect x="60"  y="140" width="28" height="55" rx="3" fill="#2563eb" opacity="0.35"/>
+    <rect x="98"  y="108" width="28" height="87" rx="3" fill="#2563eb" opacity="0.45"/>
+    <rect x="136" y="78"  width="28" height="117" rx="3" fill="#2563eb" opacity="0.55"/>
+    <rect x="174" y="98"  width="28" height="97"  rx="3" fill="#2563eb" opacity="0.65"/>
+    <rect x="212" y="58"  width="28" height="137" rx="3" fill="#2563eb" opacity="0.75"/>
+    <polyline points="74,150 112,112 150,82 188,102 226,62 300,72 400,55 520,68 650,42 780,50" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <circle cx="226" cy="62" r="4" fill="#60a5fa" opacity="0.9"/>
+    <circle cx="520" cy="68" r="4" fill="#60a5fa" opacity="0.9"/>
+    <circle cx="650" cy="42" r="4" fill="#60a5fa" opacity="0.9"/>
+    <text x="490" y="100" font-family="monospace" font-size="26" fill="#2563eb" opacity="0.12" font-weight="700">USD</text>
+    <text x="620" y="148" font-family="monospace" font-size="20" fill="#3b82f6" opacity="0.10" font-weight="700">EUR</text>
+    <text x="340" y="168" font-family="monospace" font-size="18" fill="#2563eb" opacity="0.09" font-weight="700">RUB</text>
+  </svg>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-title">Exchange Desk Bot — Руководство</div>
+    <div class="hero-sub">Полное руководство пользователя · v2026</div>
+  </div>
+</div>
+
+<div class="wrapper">
+
+<div class="meta-bar">
+  <span class="meta-pill">Telegram-бот</span>
+  <span class="meta-pill">Мультипользователь</span>
+  <span class="meta-pill">Обновлено: февраль 2026</span>
+</div>
+
+<!-- ════════════════ HOME ════════════════ -->
+<div id="home">
+
+<div class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">01</span>
+    <span class="chapter-title">Начало работы</span>
+  </div>
+  <div class="section-group">
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('about')" style="cursor:pointer">О боте</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('about')" style="cursor:pointer"><span class="sub-dot"></span>Что такое Exchange Desk Bot</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('about')" style="cursor:pointer"><span class="sub-dot"></span>Ключевые возможности</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('about')" style="cursor:pointer"><span class="sub-dot"></span>Роли пользователей</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('start')" style="cursor:pointer">Первый запуск и активация</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('start')" style="cursor:pointer"><span class="sub-dot"></span>Требования и порядок запуска</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('start')" style="cursor:pointer"><span class="sub-dot"></span>Создание своего обменника</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('start')" style="cursor:pointer"><span class="sub-dot"></span>Интерфейс и навигация</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">02</span>
+    <span class="chapter-title">Настройка</span>
+  </div>
+  <div class="section-group">
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('exchange')" style="cursor:pointer">Обменный пункт</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('exchange')" style="cursor:pointer"><span class="sub-dot"></span>Создание и базовые настройки</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('exchange')" style="cursor:pointer"><span class="sub-dot"></span>Меню обменника: все кнопки с пояснениями</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('exchange')" style="cursor:pointer"><span class="sub-dot"></span>Рекомендованный порядок настройки</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('currencies')" style="cursor:pointer">Валюты и пары</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('currencies')" style="cursor:pointer"><span class="sub-dot"></span>Список торгуемых валют</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('currencies')" style="cursor:pointer"><span class="sub-dot"></span>Кросс-валютные пары</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('currencies')" style="cursor:pointer"><span class="sub-dot"></span>Номиналы купюр</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('currencies')" style="cursor:pointer"><span class="sub-dot"></span>Дробная часть цен</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('currencies')" style="cursor:pointer"><span class="sub-dot"></span>Символы валют (эмодзи)</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('currencies')" style="cursor:pointer"><span class="sub-dot"></span>Глобальная база валют</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('quotes')" style="cursor:pointer">Котировки</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('quotes')" style="cursor:pointer"><span class="sub-dot"></span>Пошаговая установка всех курсов</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('quotes')" style="cursor:pointer"><span class="sub-dot"></span>Корректировка отдельного курса</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('quotes')" style="cursor:pointer"><span class="sub-dot"></span>Отправка таблицы в канал</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">03</span>
+    <span class="chapter-title">Работа с заказами</span>
+  </div>
+  <div class="section-group">
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('orders')" style="cursor:pointer">Создание заказов</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('orders')" style="cursor:pointer"><span class="sub-dot"></span>Заказ на обмен за национальную валюту</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('orders')" style="cursor:pointer"><span class="sub-dot"></span>Выбор операции, сумма, данные клиента</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('orders')" style="cursor:pointer"><span class="sub-dot"></span>Кросс-валютные заказы и округление</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('statuses')" style="cursor:pointer">Статусы заказов</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('statuses')" style="cursor:pointer"><span class="sub-dot"></span>Новый, Подтверждён, Выполнен, Отменён</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('statuses')" style="cursor:pointer"><span class="sub-dot"></span>Схема переходов и практические сценарии</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('editing')" style="cursor:pointer">Редактирование заказов</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('editing')" style="cursor:pointer"><span class="sub-dot"></span>Три способа открыть редактор</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('editing')" style="cursor:pointer"><span class="sub-dot"></span>Изменение курса, сумм, клиента, статуса</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('editing')" style="cursor:pointer"><span class="sub-dot"></span>Логика автоматического пересчёта</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">04</span>
+    <span class="chapter-title">Команда и данные</span>
+  </div>
+  <div class="section-group">
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('channel')" style="cursor:pointer">Канал сотрудников</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('channel')" style="cursor:pointer"><span class="sub-dot"></span>Создание канала и привязка обсуждения</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('channel')" style="cursor:pointer"><span class="sub-dot"></span>Получение chat_id</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('channel')" style="cursor:pointer"><span class="sub-dot"></span>Права бота-администратора</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('users')" style="cursor:pointer">Пользователи и роли</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('users')" style="cursor:pointer"><span class="sub-dot"></span>Описание ролей и таблица прав</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('users')" style="cursor:pointer"><span class="sub-dot"></span>Добавление и изменение пользователей</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('export')" style="cursor:pointer">Выгрузка данных</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('export')" style="cursor:pointer"><span class="sub-dot"></span>Экспорт в Excel / CSV</span></li>
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('export')" style="cursor:pointer"><span class="sub-dot"></span>Структура выгружаемых данных</span></li>
+    </ul>
+  </div>
+</div>
+
+<div class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">05</span>
+    <span class="chapter-title">Справка</span>
+  </div>
+  <div class="section-group">
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('faq')" style="cursor:pointer">Часто задаваемые вопросы</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('faq')" style="cursor:pointer"><span class="sub-dot"></span>Общие, по валютам, по заказам, по каналу</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('glossary')" style="cursor:pointer">Глоссарий</span>
+      <span class="section-arrow">›</span>
+    </div>
+    <ul class="sub-list">
+      <li class="sub-item"><span class="sub-row-link" onclick="showPage('glossary')" style="cursor:pointer"><span class="sub-dot"></span>Все ключевые термины и определения</span></li>
+    </ul>
+    <div class="section-main">
+      <span class="section-dot"></span>
+      <span class="section-row-link" onclick="showPage('support')" style="cursor:pointer">Контакты и поддержка</span>
+      <span class="section-arrow">›</span>
+    </div>
+  </div>
+</div>
+
+<div class="footer">© 2026 Exchange Desk Bot · Руководство пользователя v2026</div>
+</div><!-- /home -->
+
+
+<!-- ════════ PAGES ════════ -->
+
+<!-- ── О БОТЕ ── -->
+<div id="page-about" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">01 — О боте</span>
+  <div class="page-title">Exchange Desk Bot</div>
+
+  <p class="body-text"><strong>Exchange Desk Bot</strong> — мультипользовательская система управления обменными пунктами, полностью встроенная в Telegram. Автоматизирует весь цикл операций: от приёма заявки до формирования отчётности. Каждый обменный пункт имеет полностью изолированную базу данных — свои валюты, заказы, сотрудники и история.</p>
+
+  <div class="bot-wrap">
+    <div class="bot-phone">
+      <div class="bot-topbar">
+        <div class="bot-avatar">🏦</div>
+        <div><div class="bot-name">Exchange Desk Bot</div><div class="bot-status">бот · в сети</div></div>
+      </div>
+      <div class="bot-chat">
+        <div class="msg-bot">
+          <div class="tg-row"><span class="tg-bold">🏦 Exchange Desk</span></div>
+          <hr class="bot-divider">
+          <div class="tg-row">Добро пожаловать!</div>
+          <div class="tg-row">Вы в <span class="tg-bold">Главном меню</span>.</div>
+          <div class="tg-row tg-muted" style="margin-top:4px;">МойОбменник · Admin</div>
+          <div class="msg-time">09:00</div>
+        </div>
+        <div class="bot-kbd">
+          <div class="bot-kbd-row">
+            <div class="kbd-btn">Курсы валют</div>
+            <div class="kbd-btn">Котировки</div>
+          </div>
+          <div class="bot-kbd-row">
+            <div class="kbd-btn green">Новый заказ</div>
+            <div class="kbd-btn">Заказы</div>
+          </div>
+          <div class="bot-kbd-row">
+            <div class="kbd-btn">О проекте</div>
+            <div class="kbd-btn blue">Настройки</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Ключевые возможности</h3>
+  <div class="feat-grid">
+    <div class="feat-card"><div class="feat-icon">👥</div><div class="feat-title">Управление доступом</div><div class="feat-text">Приглашайте сотрудников, назначайте роли и уровни допуска — от владельца до кассира.</div></div>
+    <div class="feat-card"><div class="feat-icon">💱</div><div class="feat-title">Гибкие валюты</div><div class="feat-text">Кастомные тикеры, кросс-пары, номиналы купюр, дробная часть до 8 знаков.</div></div>
+    <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Аналитика и отчёты</div><div class="feat-text">Выгрузка в Excel/CSV с фильтрами по датам, статусам, валютам.</div></div>
+    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-title">Безопасность</div><div class="feat-text">Изолированная база данных для каждого обменника. Права разграничены чётко.</div></div>
+    <div class="feat-card"><div class="feat-icon">💬</div><div class="feat-title">Канал команды</div><div class="feat-text">Обсуждайте заказы, прикрепляйте скриншоты прямо в канале сотрудников.</div></div>
+    <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Автоматизация</div><div class="feat-text">Система считает суммы, округляет по номиналам, уведомляет при смене статуса.</div></div>
+  </div>
+
+  <h3 class="sub-head">Роли пользователей</h3>
+  <div class="role-grid">
+    <div class="role-grid-card"><div class="role-icon-big">👑</div><div class="role-name">Владелец</div><div class="role-desc">Полный доступ, управление персоналом, удаление обменника.</div></div>
+    <div class="role-grid-card"><div class="role-icon-big">🔧</div><div class="role-name">Администратор</div><div class="role-desc">Настройки, курсы, пользователи, канал, отчёты.</div></div>
+    <div class="role-grid-card"><div class="role-icon-big">🧑‍💼</div><div class="role-name">Оператор</div><div class="role-desc">Заказы и котировки. Без доступа к настройкам.</div></div>
+    <div class="role-grid-card"><div class="role-icon-big">💁</div><div class="role-name">Пользователь</div><div class="role-desc">Только создание заказов и просмотр курсов.</div></div>
+  </div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showHome()">← Содержание</button>
+    <button class="nav-btn primary" onclick="showPage('start')">Первый запуск →</button>
+  </div>
+</div>
+
+
+<!-- ── ПЕРВЫЙ ЗАПУСК ── -->
+<div id="page-start" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">01 — Начало работы</span>
+  <div class="page-title">Первый запуск и активация</div>
+
+  <p class="body-text">Система работает прямо в Telegram. Ничего дополнительно скачивать не нужно.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Требование</th><th>Описание</th></tr>
+      <tr><td>Устройство</td><td>Смартфон, планшет, компьютер — любая платформа</td></tr>
+      <tr><td>Приложение</td><td>Telegram (последняя версия)</td></tr>
+      <tr><td>Интернет</td><td>Стабильное соединение</td></tr>
+      <tr><td>Доступ</td><td>Приглашение от администратора или создание своего обменника</td></tr>
+    </table>
+  </div>
+
+  <div class="alert note"><span class="alert-icon">ℹ️</span><span>Учётная запись создаётся администратором заранее. Вы получаете ссылку-приглашение и попадаете сразу в рабочий процесс.</span></div>
+
+  <h3 class="sub-head">Порядок первого запуска</h3>
+
+  <div class="bot-wrap">
+    <div class="bot-phone">
+      <div class="bot-topbar">
+        <div class="bot-avatar">🏦</div>
+        <div><div class="bot-name">Exchange Desk Bot</div></div>
+      </div>
+      <div class="bot-chat">
+        <div class="msg-bot">
+          <div class="tg-row"><span class="tg-bold">Добро пожаловать!</span></div>
+          <div class="tg-row" style="margin-top:4px;">Ознакомьтесь с условиями использования и нажмите «Согласен».</div>
+          <div class="msg-time">19:10</div>
+        </div>
+        <div class="bot-kbd">
+          <div class="bot-kbd-row"><div class="kbd-btn green full">Согласен</div></div>
+          <div class="bot-kbd-row"><div class="kbd-btn red full">Отказываюсь</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="steps">
+    <li><strong>Согласие с условиями.</strong> При первом запуске бот покажет условия использования. Прочитайте и примите их — это обязательный шаг для начала работы.</li>
+    <li><strong>Выбор варианта работы.</strong> <span class="mock-btn">Получить приглашение</span> — если вас добавили в чужой обменник. <span class="mock-btn blue">Создать свой</span> — станете Владельцем с полными правами.</li>
+    <li><strong>Знакомство с интерфейсом.</strong> После активации вы увидите главное меню со всеми разделами.</li>
+  </ul>
+
+  <div class="alert tip"><span class="alert-icon">💡</span><span>Один пользователь может быть владельцем своего обменника и одновременно работать оператором в чужом — данные полностью изолированы.</span></div>
+
+  <h3 class="sub-head">Интерфейс и навигация</h3>
+  <p class="body-text">В интерфейсе бота всегда доступны три базовые кнопки навигации:</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Кнопка</th><th>Действие</th></tr>
+      <tr><td><span class="mock-btn">Главная</span></td><td>Мгновенный возврат в стартовое меню</td></tr>
+      <tr><td><span class="mock-btn">Назад</span></td><td>Шаг назад к предыдущему экрану</td></tr>
+      <tr><td><span class="mock-btn red">Отмена</span></td><td>Прервать текущее действие и выйти</td></tr>
+    </table>
+  </div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('about')">← О боте</button>
+    <button class="nav-btn primary" onclick="showPage('exchange')">Создание обменника →</button>
+  </div>
+</div>
+
+
+<!-- ── ОБМЕННИК ── -->
+<div id="page-exchange" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">02 — Настройка</span>
+  <div class="page-title">Обменный пункт</div>
+
+  <p class="body-text"><strong>Виртуальный обменный пункт</strong> — изолированная рабочая область: своё название, базовая валюта, часовой пояс, сотрудники, история заказов. Можно создать несколько пунктов для разных точек обмена — данные никогда не смешиваются.</p>
+
+  <div class="alert important"><span class="alert-icon">⚡</span><span><strong>Архитектура системы:</strong> один пользователь может работать в нескольких обменных пунктах одновременно. Каждый обменник имеет полностью изолированную базу данных.</span></div>
+
+  <h3 class="sub-head">Создание нового обменного пункта</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Обменник</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Создать обменник</span>
+</div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Введите название</h4>
+        <p>Придумайте понятное название: «Обменник на Ленинском», «Crypto Exchange», «Валюта 24/7». Отображается в шапке бота и в канале сотрудников.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Выберите базовую валюту</h4>
+        <p>Базовая валюта — национальная валюта страны, в которой работает обменник. Используется как расчётная: RUB, UAH, KZT, USD, EUR и другие.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Выберите часовой пояс</h4>
+        <p>Укажите часовой пояс для корректного отображения времени в заказах: Europe/Moscow, Asia/Almaty, Europe/Kiev, Asia/Dubai.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Подтверждение</h4>
+        <p>Бот пришлёт сообщение с параметрами созданного обменника. Вы автоматически становитесь Владельцем с полными правами.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bot-wrap">
+    <div class="bot-phone">
+      <div class="bot-topbar">
+        <div class="bot-avatar">⚙️</div>
+        <div><div class="bot-name">Настройки обменника «Fireball»</div></div>
+      </div>
+      <div class="bot-chat">
+        <div class="msg-bot">
+          <div class="tg-row"><span class="tg-bold">Настройки обменника «Fireball»:</span></div>
+          <div class="tg-row tg-muted">Часовой пояс: <span style="color:#e8e8e8;">Europe/Moscow</span></div>
+          <div class="tg-row tg-muted">Базовая валюта: <span style="color:#e8e8e8;">RUB</span></div>
+          <div class="msg-time">13:26</div>
+        </div>
+        <div class="bot-kbd">
+          <div class="bot-kbd-row">
+            <div class="kbd-btn">Часовой пояс</div>
+            <div class="kbd-btn">Базовая валюта</div>
+          </div>
+          <div class="bot-kbd-row">
+            <div class="kbd-btn blue">ID канала</div>
+            <div class="kbd-btn">Пользователи</div>
+          </div>
+          <div class="bot-kbd-row">
+            <div class="kbd-btn">Глобальные валюты</div>
+            <div class="kbd-btn">Создать обменник</div>
+            <div class="kbd-btn">Переключить активный</div>
+          </div>
+          <div class="bot-kbd-row">
+            <div class="kbd-btn full">Главное меню</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Меню обменника — все кнопки</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Кнопка</th><th>Назначение</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Часовой пояс</strong></td><td>Изменение часового пояса обменника</td><td>При переезде офиса в другой регион</td></tr>
+      <tr><td><strong>Базовая валюта</strong></td><td>Изменение национальной валюты</td><td>При смене страны работы</td></tr>
+      <tr><td><strong>ID канала</strong></td><td>Подключение канала для сотрудников</td><td>После создания закрытого канала в Telegram</td></tr>
+      <tr><td><strong>Пользователи</strong></td><td>Управление доступом сотрудников</td><td>Добавление, удаление, изменение ролей</td></tr>
+      <tr><td><strong>Глобальные валюты</strong></td><td>Связка валют с мировой базой номиналов</td><td>Для автозагрузки номиналов купюр</td></tr>
+      <tr><td><strong>Создать обменник</strong></td><td>Создание ещё одного виртуального обменного пункта</td><td>Если у вас несколько точек обмена</td></tr>
+      <tr><td><strong>Переключить активный</strong></td><td>Переключение между обменниками</td><td>Для работы в другом вашем обменнике</td></tr>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Рекомендованный порядок настройки</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Этап</th><th>Приоритет</th><th>Действие</th><th>Где</th></tr>
+      <tr><td><strong>1. База</strong></td><td><span style="color:#16a34a;font-weight:700;">Обязательно</span></td><td>Добавить торгуемые валюты</td><td>Настройки → Валютные пары → База данных</td></tr>
+      <tr><td><strong>1.1</strong></td><td><span style="color:#16a34a;font-weight:700;">Обязательно</span></td><td>Создать кросс-пары (если нужно)</td><td>там же → Кросс-курсы</td></tr>
+      <tr><td><strong>2. Номиналы</strong></td><td><span style="color:#d97706;font-weight:700;">Рекомендуется</span></td><td>Настроить купюры</td><td>Глобальные валюты / Кастомизация</td></tr>
+      <tr><td><strong>3. Детали</strong></td><td><span style="color:#2563eb;font-weight:700;">Опционально</span></td><td>Дробная часть цен</td><td>Настройки → Валютные пары → Дробная часть</td></tr>
+      <tr><td><strong>4. Детали</strong></td><td><span style="color:#2563eb;font-weight:700;">Опционально</span></td><td>Символы для валют (эмодзи)</td><td>Настройки → Валютные пары → Emoji</td></tr>
+      <tr><td><strong>5. Канал</strong></td><td><span style="color:#d97706;font-weight:700;">Рекомендуется</span></td><td>Подключить канал уведомлений</td><td>Создать канал → chat_id → ввести в боте</td></tr>
+      <tr><td><strong>6. Команда</strong></td><td><span style="color:#d97706;font-weight:700;">Рекомендуется</span></td><td>Добавить сотрудников</td><td>Настройки → Обменник → Пользователи</td></tr>
+    </table>
+  </div>
+
+  <div class="alert tip"><span class="alert-icon">💡</span><span>Настройте валюты и канал <em>до</em> добавления сотрудников — тогда они сразу увидят готовый рабочий интерфейс.</span></div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('start')">← Первый запуск</button>
+    <button class="nav-btn primary" onclick="showPage('currencies')">Валюты и пары →</button>
+  </div>
+</div>
+
+
+<!-- ── ВАЛЮТЫ ── -->
+<div id="page-currencies" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">02 — Настройка</span>
+  <div class="page-title">Валюты и пары</div>
+
+  <h3 class="sub-head">Список торгуемых валют</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Валютные пары</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">База данных валют</span>
+</div>
+
+  <p class="body-text">Валюты вводятся в одну строку через запятую. Только латиница, цифры, символы <code>_</code> и <code>-</code>. Кросс-курсы создаются отдельно — не через слэш.</p>
+
+  <div class="code-block">
+    <div class="code-good">✅ USD, EUR, GBP, CHF — стандартные валюты</div>
+    <div class="code-good">✅ USD_blue, USD_new, EUR500 — кастомные тикеры</div>
+    <div class="code-bad">❌ USD/RUB, евро, USDT💶 — такой формат не принимается</div>
+  </div>
+
+  <div class="alert warn"><span class="alert-icon">⚠️</span><span>При любом добавлении или изменении списка валют все текущие котировки сбрасываются. Используйте только латиницу, нижнее подчёркивание и дефис.</span></div>
+  <div class="alert tip"><span class="alert-icon">💡</span><span>После ввода валют бот спросит: «Добавить RUB к торгуемым валютам?» — для большинства обменников выбирайте <strong>«Нет»</strong>. Базовая валюта нужна в списке только если обменник явно торгует рублями как товаром.</span></div>
+
+  <div class="bot-wrap">
+    <div class="bot-phone">
+      <div class="bot-topbar">
+        <div class="bot-avatar">💱</div>
+        <div><div class="bot-name">База данных валют</div></div>
+      </div>
+      <div class="bot-chat">
+        <div class="msg-bot">
+          <div class="tg-row">Введите валюты через запятую.</div>
+          <hr class="bot-divider">
+          <div class="tg-row tg-muted">Только латиница и цифры</div>
+          <div class="tg-row tg-muted">При изменении курсы сбрасываются</div>
+          <div class="tg-row" style="margin-top:5px;"><span class="tg-code">Пример: USD, EUR, GBP</span></div>
+          <div class="msg-time">22:47</div>
+        </div>
+        <div class="msg-user">USD, EUR, GBP, CHF<div class="msg-time">22:48</div></div>
+        <div class="msg-bot">
+          <div class="tg-row"><span class="tg-green">✅</span> Добавить «RUB» к торгуемым?</div>
+          <div class="msg-time">22:48</div>
+        </div>
+        <div class="bot-kbd">
+          <div class="bot-kbd-row">
+            <div class="kbd-btn green">Да</div>
+            <div class="kbd-btn">Нет</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Кросс-валютные пары</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Валютные пары</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Кросс-курсы</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Добавить кросс-курс</span>
+</div>
+
+  <div class="cross-pair-block">
+    <div class="cross-pair-block-head">
+      <span class="cross-pair-block-icon">💱</span>
+      <span class="cross-pair-block-label">Что такое кросс-пара</span>
+    </div>
+    <div class="cross-pair-block-body">
+      <p class="cross-pair-definition">Обмен двух <strong>иностранных</strong> валют, минуя базовую. Формат записи: <strong>ТОРГУЕМАЯ / БАЗОВАЯ</strong></p>
+      <div class="cross-pair-formula">
+        <div class="cpf-item traded">
+          <span class="cpf-label">Торгуемая</span>
+          <span class="cpf-value">EUR</span>
+        </div>
+        <span class="cpf-sep">/</span>
+        <div class="cpf-item base">
+          <span class="cpf-label">Базовая</span>
+          <span class="cpf-value">USD</span>
+        </div>
+      </div>
+      <div class="cross-pair-example">
+        <code>EUR/USD = 1.08</code>
+        <p>1 <strong>EUR</strong> (торгуемая) стоит <strong>1.08 USD</strong> (базовая пары)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Выберите торгуемую валюту</h4>
+        <p>Бот покажет список уже добавленных валют. Выберите ту, которой торгуете (например, EUR) — это «товар».</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Выберите базовую валюту пары</h4>
+        <p>Выберите валюту, в которой выражена цена (например, USD) — это «ценник». Итоговая пара: <code>EUR/USD</code>.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Задайте название пары</h4>
+        <p>Бот предложит стандартное название (EUR/USD). Можно оставить стандартное или задать своё:</p>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Вариант</th><th>Пример</th><th>Когда использовать</th></tr>
+            <tr><td>Стандартное</td><td><code>EUR/USD</code></td><td>Большинство случаев</td></tr>
+            <tr><td>С пометкой</td><td><code>EUR/USD (CASH)</code></td><td>Разделить наличные / безнал</td></tr>
+            <tr><td>С номиналом</td><td><code>EUR500/USD100</code></td><td>Крупные купюры</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Управление созданными парами</h4>
+        <p>После создания в списке кросс-курсов доступно переименование пары и удаление. При удалении все котировки по этой паре и заказы со статусом «Новый» будут удалены — заказы в других статусах сохраняются в истории.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert warn"><span class="alert-icon">⚠️</span><span>Нельзя изменить состав валют в существующей паре. Если нужно поменять — удалите пару и создайте новую. Например: была EUR/USD, нужна USD/EUR → удалите и создайте заново.</span></div>
+
+  <h3 class="sub-head">Номиналы купюр</h3>
+  <p class="body-text">Номиналы нужны для точного расчёта сумм. Если бот знает, какие купюры у вас есть, он предложит правильное округление.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Способ</th><th>Когда использовать</th><th>Путь</th></tr>
+      <tr><td><strong>Глобальная база</strong></td><td>Стандартные номиналы (USD, EUR, GBP...)</td><td>Настройки → Обменник → Глобальные валюты</td></tr>
+      <tr><td><strong>Вручную</strong></td><td>Нестандартные или ограниченные номиналы</td><td>Настройки → Валютные пары → Кастомизация → Номиналы</td></tr>
+    </table>
+  </div>
+
+  <div class="alert tip"><span class="alert-icon">💡</span><span><strong>Зачем нужны номиналы:</strong> клиент продаёт 7520 GBP, расчётная сумма — 9964 USD. Без мелких купюр её не выдать. Бот использует настроенные номиналы (50, 100) и предложит: округлить до 10 000 USD (доплата клиента) или выдать 9900 USD (доплата офиса).</span></div>
+
+  <h3 class="sub-head">Дробная часть цен</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Валютные пары</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Кастомизация валют</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Дробная часть</span>
+</div>
+
+  <p class="body-text">Определяет точность отображения цен. Выберите валюту из списка → введите количество знаков (2–8).</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Тип валюты</th><th>Рекомендуемая точность</th><th>Пример</th></tr>
+      <tr><td>Фиат (USD, EUR, GBP)</td><td>2 знака</td><td>78.60 RUB</td></tr>
+      <tr><td>Стейблкоины (USDT)</td><td>3–4 знака</td><td>1.0035</td></tr>
+      <tr><td>Криптовалюты с малой ценой</td><td>6–8 знаков</td><td>0.000012</td></tr>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Символы валют (эмодзи)</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Валютные пары</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Кастомизация валют</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Emoji</span>
+</div>
+
+  <p class="body-text">Нажмите на тикер валюты → отправьте желаемый символ. Эмодзи отображаются в котировочных таблицах и в заказах для быстрой визуальной идентификации.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Валюта</th><th>Символ</th><th>Валюта</th><th>Символ</th></tr>
+      <tr><td>USD</td><td>💵</td><td>BTC</td><td>₿</td></tr>
+      <tr><td>EUR</td><td>💶</td><td>USDT</td><td>₮</td></tr>
+      <tr><td>GBP</td><td>💷</td><td>CNY</td><td>🀄</td></tr>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Глобальная база валют</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Обменник</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Глобальные валюты</span>
+</div>
+
+  <p class="body-text">Связка с глобальной базой автоматически загружает все существующие номиналы купюр и эмодзи для выбранной валюты.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Статус в боте</th><th>Что означает</th></tr>
+      <tr><td>USD — связана</td><td>Загружены номиналы купюр и эмодзи из глобальной базы</td></tr>
+      <tr><td>— не связана</td><td>Связь не установлена, номиналы нужно задать вручную</td></tr>
+    </table>
+  </div>
+
+  <div class="alert tip"><span class="alert-icon">💡</span><span><strong>Автоопределение кастомных тикеров:</strong> бот анализирует название: USD_blue → найдено «USD» → предложит 💵 USD. EUR500 → найдено «EUR» → предложит 💶 EUR. Если совпадений нет — покажет полный список мировых валют для ручного выбора.</span></div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('exchange')">← Обменник</button>
+    <button class="nav-btn primary" onclick="showPage('quotes')">Котировки →</button>
+  </div>
+</div>
+
+
+<!-- ── КОТИРОВКИ ── -->
+<div id="page-quotes" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">02 — Настройка</span>
+  <div class="page-title">Котировки</div>
+
+  <div class="alert warn"><span class="alert-icon">⚠️</span><span><strong>Предварительные условия:</strong> перед началом работы должны быть настроены валюты и базовые курсы; кросс-пары (опционально); номиналы купюр (рекомендуется).</span></div>
+
+  <h3 class="sub-head">Способ 1 — Пошаговая установка всех котировок</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Главное меню</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Выставление котировок</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Выставить все котировки</span>
+</div>
+
+  <p class="body-text">Бот пошагово запросит курсы покупки и продажи для каждой валюты. После завершения пришлёт готовую котировочную таблицу:</p>
+
+  <pre><code>           Покупка | Продажа
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+котировки к RUB:
+USD          91.50 | 93.50  💵
+EUR          99.00 | 101.50 💶
+GBP          56.34 | 90.00  💷
+
+кросс-курсы:
+EUR/USD       2.569 | 3.863
+
+📅 16.02.26 13:03</code></pre>
+
+  <h3 class="sub-head">Способ 2 — Корректировка отдельного курса</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Выставление котировок</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Корректировка курса</span>
+</div>
+
+  <p class="body-text">Бот покажет все курсы в виде инлайн-кнопок с цветовой маркировкой. Нажмите нужный и введите новое значение.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Цвет кнопки</th><th>Операция</th></tr>
+      <tr><td><span style="color:#16a34a;font-weight:600;">Зелёный</span></td><td>Курс покупки — обменник покупает у клиента</td></tr>
+      <tr><td><span style="color:#dc2626;font-weight:600;">Красный</span></td><td>Курс продажи — обменник продаёт клиенту</td></tr>
+    </table>
+  </div>
+
+  <div class="alert tip"><span class="alert-icon">💡</span><span>Для массового изменения курсов используйте Способ 1 — быстрее. Способ 2 удобен для оперативной корректировки одной-двух позиций без сброса остальных.</span></div>
+
+  <h3 class="sub-head">Варианты отправки таблицы в канал</h3>
+  <p class="body-text">В меню «Курсы валют» доступны несколько вариантов отправки таблицы котировок в канал сотрудников:</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Кнопка</th><th>Формат</th><th>Когда использовать</th></tr>
+      <tr><td><span class="mock-btn blue">Отправить в канал</span></td><td>Цветная текстовая таблица</td><td>Канал сотрудников — быстрее загружается, удобнее копировать</td></tr>
+      <tr><td><span class="mock-btn">Картинка</span></td><td>Изображение цветное</td><td>Для пересылки клиентам или публикации как готовый прайс</td></tr>
+      <tr><td><span class="mock-btn">Картинка ЧБ</span></td><td>Чёрно-белое изображение</td><td>Для печати или каналов с минималистичным оформлением</td></tr>
+      <tr><td><span class="mock-btn">Картинка БЧ</span></td><td>Белый текст на тёмном фоне</td><td>Хорошо смотрится в тёмных Telegram-каналах</td></tr>
+    </table>
+  </div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('currencies')">← Валюты</button>
+    <button class="nav-btn primary" onclick="showPage('orders')">Заказы →</button>
+  </div>
+</div>
+
+
+<!-- ── ЗАКАЗЫ ── -->
+<div id="page-orders" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">03 — Заказы</span>
+  <div class="page-title">Создание заказов</div>
+
+  <h3 class="sub-head">Типы заказов</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Тип</th><th>Пример</th></tr>
+      <tr><td><strong>Обмен за национальную валюту</strong></td><td>USD → RUB, EUR → RUB</td></tr>
+      <tr><td><strong>Кросс-валютная пара</strong></td><td>EUR → USD, GBP → USD</td></tr>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Создание заказа на обмен за национальную валюту</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Главное меню</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Новый заказ</span>
+</div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Выберите валюту и операцию</h4>
+        <p>Бот покажет кнопки с актуальными курсами. Кнопки разделены по цвету операции:</p>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Цвет</th><th>Операция</th><th>Пример кнопки</th></tr>
+            <tr><td><span style="color:#16a34a;font-weight:700;">Зелёная</span></td><td>Обменник покупает у клиента</td><td><span class="mock-btn green">EUR 76.00</span></td></tr>
+            <tr><td><span style="color:#dc2626;font-weight:700;">Красная</span></td><td>Обменник продаёт клиенту</td><td><span class="mock-btn red">EUR 78.60</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Выберите способ расчёта</h4>
+        <p><strong>По сумме выдачи</strong> — клиент знает, сколько иностранной валюты хочет получить.<br>
+        <strong>По сумме получения</strong> — клиент знает, сколько рублей готов заплатить.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Введите сумму</h4>
+        <p>Введите числовое значение в запрошенной валюте. Бот рассчитает встречную сумму автоматически по текущему курсу.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Введите данные клиента</h4>
+        <p>Можно указать любой удобный формат идентификации. Чтобы пропустить — отправьте <code>-</code>.</p>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Формат</th><th>Пример</th><th>Когда использовать</th></tr>
+            <tr><td>@username</td><td><code>@ivan_petrov</code></td><td>Если клиент есть в Telegram</td></tr>
+            <tr><td>Имя и фамилия</td><td><code>Иван Петров</code></td><td>Для постоянных клиентов</td></tr>
+            <tr><td>Телефон</td><td><code>+7 999 123-45-67</code></td><td>Для связи с клиентом</td></tr>
+            <tr><td>Код клиента</td><td><code>VIP-0042</code></td><td>При наличии системы кодов</td></tr>
+            <tr><td>Комбинация</td><td><code>Иван, @ivan, VIP</code></td><td>Несколько идентификаторов сразу</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Проверьте предпросмотр заказа</h4>
+        <p>Бот покажет детали заказа: номер, операцию, курс, суммы, клиента, статус. Перед отправкой обязательно проверьте корректность всех данных.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bot-wrap">
+    <div class="bot-phone">
+      <div class="bot-topbar">
+        <div class="bot-avatar">📋</div>
+        <div><div class="bot-name">Предпросмотр заказа</div></div>
+      </div>
+      <div class="bot-chat">
+        <div class="msg-bot" style="font-size:11.5px;">
+          <div><span class="tg-bold">Заказ #23</span></div>
+          <hr class="bot-divider">
+          <div class="tg-row">Продажа EUR/RUB</div>
+          <div class="tg-row">Курс: <span class="tg-yellow">78.60 RUB</span></div>
+          <div class="tg-row">Отдаём: <span class="tg-bold">500.00 EUR</span></div>
+          <div class="tg-row">Получаем: <span class="tg-bold">39 300.00 RUB</span></div>
+          <div class="tg-row">Клиент: Иван</div>
+          <div class="tg-row"><span class="tg-yellow">Новый</span></div>
+          <div class="msg-time">13:45</div>
+        </div>
+        <div class="bot-kbd">
+          <div class="bot-kbd-row">
+            <div class="kbd-btn">Редактировать</div>
+            <div class="kbd-btn blue">В канал</div>
+          </div>
+          <div class="bot-kbd-row">
+            <div class="kbd-btn">Скриншоты</div>
+            <div class="kbd-btn red">Отмена</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Кнопка</th><th>Действие</th></tr>
+      <tr><td><span class="mock-btn">Редактировать</span></td><td>Изменить курс, суммы или данные клиента до отправки</td></tr>
+      <tr><td><span class="mock-btn">Скриншоты</span></td><td>Прикрепить переписку с клиентом, чек или документ</td></tr>
+      <tr><td><span class="mock-btn blue">В канал</span></td><td>Отправить заказ в канал сотрудников; статус меняется Новый → Подтверждён</td></tr>
+      <tr><td><span class="mock-btn red">Отмена</span></td><td>Отменить создание заказа (недоступна после отправки в канал)</td></tr>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Кросс-валютный заказ и округление</h3>
+  <p class="body-text">Порядок создания аналогичен базовому заказу. На шаге расчёта суммы бот предложит варианты округления:</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Вариант</th><th>Описание</th><th>Пример (расчётная 1 284.50 USD)</th></tr>
+      <tr><td><strong>Без сдачи</strong></td><td>Точная расчётная сумма без округления</td><td>Выдать 1 284.50 USD</td></tr>
+      <tr><td><strong>Доплата клиента</strong></td><td>Клиент получает больше USD, доплачивает рублями</td><td>Выдать 1 300 USD + клиент доплачивает 1 449.25 RUB</td></tr>
+      <tr><td><strong>Доплата офиса</strong></td><td>Офис выдаёт меньше USD, доплачивает рублями</td><td>Выдать 1 200 USD + офис доплачивает разницу в RUB</td></tr>
+    </table>
+  </div>
+
+  <div class="alert warn"><span class="alert-icon">⚠️</span><span><strong>Редактирование кросс-заказов — в разработке.</strong> В текущей версии редактирование курса для кросс-операций недоступно. Если нужно изменить параметры — отмените заказ и создайте новый с корректными данными.</span></div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('quotes')">← Котировки</button>
+    <button class="nav-btn primary" onclick="showPage('statuses')">Статусы →</button>
+  </div>
+</div>
+
+
+<!-- ── СТАТУСЫ ── -->
+<div id="page-statuses" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">03 — Заказы</span>
+  <div class="page-title">Статусы заказов</div>
+
+  <div class="status-cards">
+    <div class="status-card status-new">
+      <div class="status-card-head"><span>Новый</span></div>
+      <div class="status-card-body">
+        <p class="status-when">Автоматически при создании; при откате из других статусов</p>
+        <p>Создан, не отправлен в канал. Можно редактировать все параметры.</p>
+        <div class="status-transitions">
+          <span class="st-label">Переходы:</span>
+          <span class="st-tag">→ Подтверждён</span>
+          <span class="st-tag">→ Выполнен</span>
+          <span class="st-tag">→ Отменён</span>
+        </div>
+      </div>
+    </div>
+    <div class="status-card status-confirmed">
+      <div class="status-card-head"><span>Подтверждён</span></div>
+      <div class="status-card-body">
+        <p class="status-when">После нажатия «В канал» или вручную через редактирование</p>
+        <p>Готов к выполнению, виден в канале сотрудников. Кнопка «Отмена» недоступна.</p>
+        <div class="status-transitions">
+          <span class="st-label">Переходы:</span>
+          <span class="st-tag">→ Выполнен</span>
+          <span class="st-tag">→ Отменён</span>
+          <span class="st-tag">→ Новый</span>
+        </div>
+      </div>
+    </div>
+    <div class="status-card status-done">
+      <div class="status-card-head"><span>Выполнен</span></div>
+      <div class="status-card-body">
+        <p class="status-when">Вручную через редактирование</p>
+        <p>Обмен завершён. Данные уходят в историю и доступны для выгрузки.</p>
+        <div class="status-transitions">
+          <span class="st-label">Откат:</span>
+          <span class="st-tag">→ Новый</span>
+        </div>
+      </div>
+    </div>
+    <div class="status-card status-cancelled">
+      <div class="status-card-head"><span>Отменён</span></div>
+      <div class="status-card-body">
+        <p class="status-when">Вручную через редактирование</p>
+        <p>Сделка не состоялась. Заказ закрыт, данные сохраняются.</p>
+        <div class="status-transitions">
+          <span class="st-label">Откат:</span>
+          <span class="st-tag">→ Новый</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Практические сценарии</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Ситуация</th><th>Из</th><th>В</th><th>Примечание</th></tr>
+      <tr><td>Обычная сделка</td><td><span class="status new">Новый</span></td><td><span class="status confirm">Подтверждён</span></td><td>Автоматически при отправке в канал</td></tr>
+      <tr><td>Обмен завершён</td><td><span class="status confirm">Подтверждён</span></td><td><span class="status done">Выполнен</span></td><td>Вручную через редактирование</td></tr>
+      <tr><td>Клиент отказался</td><td><span class="status confirm">Подтверждён</span></td><td><span class="status cancel">Отменён</span></td><td>Вручную через редактирование</td></tr>
+      <tr><td>Нашли ошибку</td><td><span class="status confirm">Подтверждён</span></td><td><span class="status new">Новый</span></td><td>Откат, затем исправление и повтор</td></tr>
+    </table>
+  </div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('orders')">← Заказы</button>
+    <button class="nav-btn primary" onclick="showPage('editing')">Редактирование →</button>
+  </div>
+</div>
+
+
+<!-- ── РЕДАКТИРОВАНИЕ ── -->
+<div id="page-editing" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">03 — Заказы</span>
+  <div class="page-title">Редактирование заказов</div>
+
+  <p class="body-text">Заказ можно открыть на редактирование тремя способами:</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Способ</th><th>Путь</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Из предпросмотра</strong></td><td>Нажать «Редактировать» сразу после создания</td><td>До отправки в канал</td></tr>
+      <tr><td><strong>Через меню бота</strong></td><td>Заказы → Редактировать → ввести номер</td><td>В любой момент</td></tr>
+      <tr><td><strong>Из канала</strong></td><td>Нажать ссылку «Редактировать заказ #N» в канале</td><td>Прямо из ленты заказов</td></tr>
+    </table>
+  </div>
+
+  <div class="alert important"><span class="alert-icon">⚡</span><span><strong>Редактирование из канала:</strong> при нажатии ссылки в канале бот позволит изменить заказ любому участнику канала, даже без роли в обменном пункте. Это удобно для кассиров, которым нужно лишь менять статус, не имея полного доступа к системе.</span></div>
+
+  <div class="bot-wrap">
+    <div class="bot-phone">
+      <div class="bot-topbar">
+        <div class="bot-avatar">✏️</div>
+        <div><div class="bot-name">Редактирование #23</div></div>
+      </div>
+      <div class="bot-chat">
+        <div class="msg-bot" style="font-size:11.5px;">
+          <div class="tg-row"><span class="tg-bold">Заказ #23</span></div>
+          <hr class="bot-divider">
+          <div class="tg-row">Статус: <span class="tg-yellow">Подтверждён</span></div>
+          <div class="tg-row">Курс: 78.60 · EUR: 500.00 · RUB: 39 300</div>
+          <div class="tg-row">Клиент: Иван</div>
+          <div class="msg-time">13:14</div>
+        </div>
+        <div class="bot-kbd">
+          <div class="bot-kbd-row"><div class="kbd-btn full">Изменить курс</div></div>
+          <div class="bot-kbd-row"><div class="kbd-btn full">Сумма выдачи EUR</div></div>
+          <div class="bot-kbd-row"><div class="kbd-btn full">Сумма получения RUB</div></div>
+          <div class="bot-kbd-row"><div class="kbd-btn full">Изменить клиента</div></div>
+          <div class="bot-kbd-row"><div class="kbd-btn full blue">Изменить статус</div></div>
+          <div class="bot-kbd-row">
+            <div class="kbd-btn">К заказу</div>
+            <div class="kbd-btn">Главная</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Что можно изменить</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Параметр</th><th>Что происходит при изменении</th></tr>
+      <tr><td><strong>Курс обмена</strong></td><td>Автоматически пересчитывается зависимая сумма</td></tr>
+      <tr><td><strong>Сумма выдачи</strong></td><td>Пересчитывается сумма получения по текущему курсу</td></tr>
+      <tr><td><strong>Сумма получения</strong></td><td>Пересчитывается сумма выдачи по текущему курсу</td></tr>
+      <tr><td><strong>Информация о клиенте</strong></td><td>Обновляется имя, телефон или username</td></tr>
+      <tr><td><strong>Статус заказа</strong></td><td>Изменяется на любой из допустимых</td></tr>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Логика автоматического пересчёта</h3>
+  <div class="recalc-cards">
+    <div class="recalc-card">
+      <div class="recalc-label">Создан по сумме получения</div>
+      <div class="recalc-rule">Сумма получения <strong>фиксируется</strong> — пересчитывается сумма выдачи (RUB)</div>
+    </div>
+    <div class="recalc-card">
+      <div class="recalc-label">Создан по сумме выдачи</div>
+      <div class="recalc-rule">Сумма выдачи (RUB) <strong>фиксируется</strong> — пересчитывается сумма получения</div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Практические примеры</h3>
+
+  <p class="body-text"><strong>Изменение курса обмена.</strong> Клиенту зафиксирован индивидуальный курс 78.5 вместо стандартного 78.6. Нажмите «Изменить курс» → введите новое значение. Бот пересчитает сумму автоматически:</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Параметр</th><th>До</th><th>После</th><th>Разница</th></tr>
+      <tr><td>Курс</td><td>78.60 RUB</td><td>78.50 RUB</td><td>↓ 0.10</td></tr>
+      <tr><td>Сумма EUR</td><td>500.00</td><td>500.00</td><td>—</td></tr>
+      <tr><td>Сумма RUB</td><td>39 300.00</td><td>39 250.00</td><td>↓ 50.00</td></tr>
+    </table>
+  </div>
+
+  <p class="body-text"><strong>Изменение суммы выдачи.</strong> Клиент передумал и хочет получить не 500, а 600 EUR по тому же курсу. Нажмите «Сумма выдачи EUR» → введите 600. Курс не меняется, сумма RUB пересчитывается автоматически.</p>
+
+  <p class="body-text"><strong>Изменение суммы получения.</strong> У клиента ровно 40 000 RUB — нужно пересчитать количество EUR. Нажмите «Сумма получения RUB» → введите 40000. Бот пересчитает сумму EUR по текущему курсу.</p>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('statuses')">← Статусы</button>
+    <button class="nav-btn primary" onclick="showPage('channel')">Канал →</button>
+  </div>
+</div>
+
+
+<!-- ── КАНАЛ ── -->
+<div id="page-channel" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">04 — Команда и данные</span>
+  <div class="page-title">Канал сотрудников</div>
+
+  <p class="body-text">Канал в Telegram — рабочий штаб вашего обменника. Все заказы, обсуждения и файлы собираются в одном месте.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Возможность</th><th>Описание</th></tr>
+      <tr><td><strong>Единая лента заказов</strong></td><td>Новые и подтверждённые заказы автоматически попадают в канал</td></tr>
+      <tr><td><strong>Обсуждения</strong></td><td>Сотрудники комментируют заказы прямо в канале в отдельных ветках</td></tr>
+      <tr><td><strong>Быстрое редактирование</strong></td><td>Можно менять параметры заказа, не заходя в бот — нажать ссылку в посте</td></tr>
+      <tr><td><strong>Скриншоты и файлы</strong></td><td>Переписки с клиентами, чеки, подтверждения — всё хранится в одном месте</td></tr>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Этапы настройки канала</h3>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Создайте закрытый канал в Telegram</h4>
+        <p>Новое сообщение → New Channel → укажите название → выберите тип <strong>Private channel</strong>. Название, например: «Обменник — оперативный».</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Привяжите группу обсуждения</h4>
+        <p>Управление каналом → Обсуждение → «Выбрать существующую группу» или «Создать новую группу». После привязки под каждым постом появится кнопка «Комментировать».</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Получите chat_id канала</h4>
+        <p>Перешлите любой пост из вашего канала одному из этих ботов:</p>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Бот</th><th>Особенность</th></tr>
+            <tr><td><code>@JsonDumpBot</code></td><td>Подробный JSON с полной структурой объекта</td></tr>
+            <tr><td><code>@getidsbot</code></td><td>Много информации об объекте</td></tr>
+            <tr><td><code>@myidbot</code></td><td>Классика — простой и надёжный</td></tr>
+            <tr><td><code>@userinfobot</code></td><td>ID при пересылке сообщений</td></tr>
+            <tr><td><code>@getmyid_bot</code></td><td>Быстро и просто</td></tr>
+          </table>
+        </div>
+        <div class="alert danger"><span class="alert-icon">🚫</span><span>Chat_id канала всегда содержит знак <strong>−</strong> в начале. Копируйте вместе с минусом! Например: <code>-1003639640960</code></span></div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Введите chat_id в боте</h4>
+        <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Обменник</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">ID канала</span>
+</div>
+        <p>Введите chat_id со знаком минус. Бот подтвердит подключение.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Назначьте бота администратором канала</h4>
+        <p>Управление каналом → Администраторы → Добавить администратора → найдите бота по username.</p>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Право</th><th>Зачем нужно</th><th>Статус</th></tr>
+            <tr><td>Постить сообщения</td><td>Отправлять заказы в канал</td><td><strong>Обязательно</strong></td></tr>
+            <tr><td>Редактировать сообщения</td><td>Обновлять статусы и данные заказа</td><td><strong>Обязательно</strong></td></tr>
+            <tr><td>Удалять сообщения</td><td>Управление заказами в канале</td><td>Рекомендуется</td></tr>
+            <tr><td>Добавлять подписчиков</td><td>Бот может приглашать сотрудников</td><td>Рекомендуется</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h4>Проверьте работу</h4>
+        <p>Отправьте котировочную таблицу: Главное меню → Курсы валют → Отправить в канал. Если таблица появилась в канале — настройка выполнена корректно.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <h4>Добавьте сотрудников</h4>
+        <p>Добавьте сотрудников в канал и группу обсуждения. Теперь они будут получать уведомления о новых заказах.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('editing')">← Редактирование</button>
+    <button class="nav-btn primary" onclick="showPage('users')">Пользователи →</button>
+  </div>
+</div>
+
+
+<!-- ── ПОЛЬЗОВАТЕЛИ ── -->
+<div id="page-users" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">04 — Команда и данные</span>
+  <div class="page-title">Пользователи и роли</div>
+
+  <h3 class="sub-head">Описание ролей</h3>
+  <div class="role-cards">
+    <div class="role-card">
+      <div class="role-card-header"><span class="badge badge-owner">Владелец</span><span class="role-card-sub">Основатель бизнеса</span></div>
+      <div class="role-card-body">
+        <div class="role-row role-can"><span class="role-icon">✓</span>Все функции без ограничений</div>
+        <div class="role-row role-can"><span class="role-icon">✓</span>Удаление обменного пункта</div>
+        <div class="role-row role-can"><span class="role-icon">✓</span>Управление всеми пользователями</div>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-header"><span class="badge badge-admin">Администратор</span><span class="role-card-sub">Управляющий / заместитель</span></div>
+      <div class="role-card-body">
+        <div class="role-row role-can"><span class="role-icon">✓</span>Создание заказов и котировок</div>
+        <div class="role-row role-can"><span class="role-icon">✓</span>Настройка валют и канала</div>
+        <div class="role-row role-can"><span class="role-icon">✓</span>Управление пользователями</div>
+        <div class="role-row role-cant"><span class="role-icon">✗</span>Удаление обменника</div>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-header"><span class="badge badge-operator">Оператор</span><span class="role-card-sub">Сотрудник зала</span></div>
+      <div class="role-card-body">
+        <div class="role-row role-can"><span class="role-icon">✓</span>Создание заказов</div>
+        <div class="role-row role-can"><span class="role-icon">✓</span>Выставление котировок</div>
+        <div class="role-row role-cant"><span class="role-icon">✗</span>Управление заказами других</div>
+        <div class="role-row role-cant"><span class="role-icon">✗</span>Настройка валют и пользователей</div>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-card-header"><span class="badge badge-user">Пользователь</span><span class="role-card-sub">Кассир</span></div>
+      <div class="role-card-body">
+        <div class="role-row role-can"><span class="role-icon">✓</span>Создание заказов</div>
+        <div class="role-row role-can"><span class="role-icon">✓</span>Просмотр курсов валют</div>
+        <div class="role-row role-cant"><span class="role-icon">✗</span>Выставление котировок</div>
+        <div class="role-row role-cant"><span class="role-icon">✗</span>Все настройки системы</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Таблица прав доступа</h3>
+  <div class="rights-grid">
+    <div class="rights-header">
+      <div class="rg-func">Функция</div>
+      <div class="rg-role"><span class="badge badge-owner" style="font-size:9px;padding:1px 5px;">Вл.</span></div>
+      <div class="rg-role"><span class="badge badge-admin" style="font-size:9px;padding:1px 5px;">Адм.</span></div>
+      <div class="rg-role"><span class="badge badge-operator" style="font-size:9px;padding:1px 5px;">Опер.</span></div>
+      <div class="rg-role"><span class="badge badge-user" style="font-size:9px;padding:1px 5px;">Польз.</span></div>
+    </div>
+    <div class="rg-row">
+      <div class="rg-func">Создание заказов</div>
+      <div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div>
+    </div>
+    <div class="rg-row">
+      <div class="rg-func">Просмотр курсов</div>
+      <div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div>
+    </div>
+    <div class="rg-row">
+      <div class="rg-func">Выставление котировок</div>
+      <div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-no">—</div>
+    </div>
+    <div class="rg-row">
+      <div class="rg-func">Управление заказами</div>
+      <div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-no">—</div><div class="rg-role rg-no">—</div>
+    </div>
+    <div class="rg-row">
+      <div class="rg-func">Настройка валют</div>
+      <div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-no">—</div><div class="rg-role rg-no">—</div>
+    </div>
+    <div class="rg-row">
+      <div class="rg-func">Управление пользователями</div>
+      <div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-no">—</div><div class="rg-role rg-no">—</div>
+    </div>
+    <div class="rg-row">
+      <div class="rg-func">Подключение канала</div>
+      <div class="rg-role rg-yes">✓</div><div class="rg-role rg-yes">✓</div><div class="rg-role rg-no">—</div><div class="rg-role rg-no">—</div>
+    </div>
+    <div class="rg-row">
+      <div class="rg-func">Удаление обменника</div>
+      <div class="rg-role rg-yes">✓</div><div class="rg-role rg-no">—</div><div class="rg-role rg-no">—</div><div class="rg-role rg-no">—</div>
+    </div>
+  </div>
+
+  <h3 class="sub-head">Добавление пользователей</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Обменник</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Пользователи</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Добавить пользователя</span>
+</div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Ситуация</th><th>Что вводить</th><th>Пример</th></tr>
+      <tr><td>Пользователь активировал бота</td><td>@username</td><td><code>@ivan_operator</code></td></tr>
+      <tr><td>Пользователь НЕ активировал бота</td><td>Telegram ID (только цифры)</td><td><code>123456789</code></td></tr>
+    </table>
+  </div>
+
+  <div class="alert note"><span class="alert-icon">ℹ️</span><span><strong>Как получить Telegram ID:</strong> пользователь открывает бот <code>@myidbot</code>, нажимает /start — бот пришлёт ID. Telegram ID — только цифры, без знака «−».</span></div>
+
+  <p class="body-text">По умолчанию новый пользователь получает роль <strong>Пользователь</strong>.</p>
+
+  <h3 class="sub-head">Изменение роли и удаление доступа</h3>
+  <div class="menu-path">
+  <span class="mp-btn">Настройки</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Обменник</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Пользователи</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Права пользователей</span>
+</div>
+
+  <p class="body-text">Нажмите «Редактировать» рядом с нужным пользователем. Бот покажет доступные роли и кнопку удаления доступа.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Сценарий</th><th>Действие</th><th>Результат</th></tr>
+      <tr><td>Новый сотрудник</td><td>Оставьте роль Пользователь</td><td>Минимальный доступ, безопасно</td></tr>
+      <tr><td>Опытный кассир</td><td>Назначьте роль Оператора</td><td>Сможет выставлять курсы</td></tr>
+      <tr><td>Заместитель</td><td>Назначьте роль Администратора</td><td>Полное управление без права удаления</td></tr>
+      <tr><td>Увольнение</td><td>Нажмите «Удалить доступ»</td><td>Полная блокировка, данные сохраняются</td></tr>
+    </table>
+  </div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('channel')">← Канал</button>
+    <button class="nav-btn primary" onclick="showPage('export')">Выгрузка данных →</button>
+  </div>
+</div>
+
+
+<!-- ── ВЫГРУЗКА ── -->
+<div id="page-export" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">04 — Команда и данные</span>
+  <div class="page-title">Выгрузка данных</div>
+
+  <p class="body-text">Выгрузка позволяет экспортировать данные о всех заказах в формате CSV или Excel для работы в табличных редакторах. Поддерживается фильтрация по дате, статусу и валюте.</p>
+
+  <div class="menu-path">
+  <span class="mp-btn">Главное меню</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn">Заказы</span>
+  <span class="mp-sep">›</span>
+  <span class="mp-btn active">Выгрузка</span>
+</div>
+
+  <h3 class="sub-head">Кому и зачем нужна выгрузка</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Роль</th><th>Цель</th><th>Ключевые колонки</th></tr>
+      <tr><td><span class="badge badge-owner">Владелец / Директор</span></td><td>Контроль оборотов, анализ активности</td><td>Total Base, Status, Created At, Client Name</td></tr>
+      <tr><td>Бухгалтер</td><td>Сверка операций, расчёт наценок, отчётность</td><td>ID, Rate, Total Base, Surcharge Amount, Status</td></tr>
+      <tr><td>Аналитик</td><td>Анализ валютных пар, маржинальности</td><td>Rate, Is Cross Rate, Surcharge Amount, Name</td></tr>
+      <tr><td>Менеджер по клиентам</td><td>Проверка статусов, контроль наценок</td><td>Client Name, Status, Surcharge Type, Created At</td></tr>
+      <tr><td>Кассир</td><td>Сверка сумм, проверка корректности</td><td>Type, Quote, Base, Total Base, Total Quote, Rate</td></tr>
+    </table>
+  </div>
+
+  <h3 class="sub-head">Структура выгружаемых данных</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Колонка</th><th>Описание</th><th>Пример</th></tr>
+      <tr><td><code>ID</code></td><td>Уникальный номер заказа</td><td>25, 26</td></tr>
+      <tr><td><code>Type</code></td><td>Тип операции: sell / buy</td><td>sell, buy</td></tr>
+      <tr><td><code>Name</code></td><td>Название валютной пары</td><td>EUR, EUR/USD(CASH)</td></tr>
+      <tr><td><code>Quote</code></td><td>Торгуемая валюта</td><td>EUR</td></tr>
+      <tr><td><code>Base</code></td><td>Базовая валюта</td><td>RUB, USD</td></tr>
+      <tr><td><code>Rate</code></td><td>Курс обмена</td><td>78.6, 2.569</td></tr>
+      <tr><td><code>Total Base</code></td><td>Сумма в базовой валюте</td><td>39 300, 1 300</td></tr>
+      <tr><td><code>Total Quote</code></td><td>Сумма в торгуемой валюте</td><td>500</td></tr>
+      <tr><td><code>Client Name</code></td><td>Имя клиента</td><td>Иван</td></tr>
+      <tr><td><code>Status</code></td><td>Статус заказа</td><td>confirmed, new</td></tr>
+      <tr><td><code>Is Cross Rate</code></td><td>Является ли кросс-курсом</td><td>No, Yes</td></tr>
+      <tr><td><code>Surcharge Type</code></td><td>Тип наценки при округлении</td><td>Client Pays</td></tr>
+      <tr><td><code>Surcharge Amount</code></td><td>Сумма наценки / доплаты</td><td>1 449.25</td></tr>
+      <tr><td><code>Surcharge Currency</code></td><td>Валюта наценки</td><td>RUB</td></tr>
+      <tr><td><code>Created At</code></td><td>Дата и время создания</td><td>2026-02-17 21:28:08</td></tr>
+      <tr><td><code>Updated At</code></td><td>Дата последнего изменения</td><td>2026-02-17 21:30:24</td></tr>
+    </table>
+  </div>
+
+  <div class="alert tip"><span class="alert-icon">💡</span><span>Регулярно выгружайте данные для резервного копирования. Расширенная бухгалтерская аналитика находится в разработке.</span></div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('users')">← Пользователи</button>
+    <button class="nav-btn primary" onclick="showPage('faq')">FAQ →</button>
+  </div>
+</div>
+
+
+<!-- ── FAQ ── -->
+<div id="page-faq" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">05 — Справка</span>
+  <div class="page-title">Часто задаваемые вопросы</div>
+
+  <div class="faq-group">
+    <div class="faq-group-title">Общие вопросы</div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Можно ли работать одновременно в нескольких обменных пунктах?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Да! Один пользователь может быть владельцем своего обменного пункта и одновременно работать оператором в чужом. Данные разных обменников полностью изолированы — пересечений нет.</p></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Что делать, если бот не отвечает?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><ol><li>Проверьте интернет-соединение</li><li>Перезапустите Telegram</li><li>Отправьте команду <code>/start</code></li><li>Если проблема сохраняется — свяжитесь с поддержкой</li></ol></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Как удалить обменный пункт?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Удалить обменник может только <strong>владелец</strong> через настройки. Все данные будут безвозвратно удалены. Эту операцию нельзя отменить.</p></div>
+    </div>
+  </div>
+
+  <div class="faq-group">
+    <div class="faq-group-title">Вопросы по валютам</div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Зачем нужна связка с глобальной базой номиналов?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Глобальная база автоматически подгружает все существующие номиналы купюр для валюты. Это экономит время на ручной настройке и гарантирует актуальность данных. Без номиналов бот не может предложить корректные варианты округления при создании заказа.</p></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Можно ли создать кастомный тикер валюты?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Да, можно создать любой тикер: <code>USD_new</code>, <code>EUR500</code>, <code>Dollar_cash</code>. При связке с глобальной базой бот попытается автоматически определить соответствующую мировую валюту по названию.</p></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Как изменить дробную часть после настройки?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Настройки → Валютные пары → Кастомизация валют → Дробная часть → выбрать валюту → ввести нужное значение (2–8 знаков). Изменение вступает в силу немедленно.</p></div>
+    </div>
+  </div>
+
+  <div class="faq-group">
+    <div class="faq-group-title">Вопросы по заказам</div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Можно ли редактировать заказ на кросс-пару?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Функция редактирования кросс-курсов находится в разработке. Для изменения нужно отменить заказ и создать новый с корректными параметрами.</p></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Как изменить статус заказа?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Откройте заказ на редактирование любым из трёх способов (предпросмотр / меню бота / ссылка в канале) и выберите «Изменить статус».</p></div>
+    </div>
+  </div>
+
+  <div class="faq-group">
+    <div class="faq-group-title">Вопросы по каналу</div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Как получить chat_id канала?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer">
+        <p>Используйте любого стороннего бота — перешлите ему пост из канала:</p>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Бот</th><th>Особенность</th></tr>
+            <tr><td><code>@JsonDumpBot</code></td><td>Подробный JSON с полной структурой объекта</td></tr>
+            <tr><td><code>@getidsbot</code></td><td>Много информации об объекте</td></tr>
+            <tr><td><code>@myidbot</code></td><td>Классика — простой и надёжный</td></tr>
+            <tr><td><code>@userinfobot</code></td><td>ID при пересылке сообщений</td></tr>
+            <tr><td><code>@getmyid_bot</code></td><td>Быстро и просто</td></tr>
+          </table>
+        </div>
+        <p>Алгоритм: Откройте бота → нажмите Start → перешлите любой пост из канала → получите chat_id.</p>
+        <div class="alert danger"><span class="alert-icon">🚫</span><span>Chat_id канала всегда содержит знак <code>-</code> в начале. Копируйте вместе со знаком минус! Например: <code>-1003639640960</code></span></div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Обязательно ли создавать канал для сотрудников?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Нет, это опционально. Бот работает и без канала. Но канал значительно упрощает командную работу: все заказы видны в единой ленте, можно обсуждать и редактировать прямо там.</p></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Можно ли использовать публичный канал?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer"><p>Настоятельно рекомендуется использовать <strong>закрытый (приватный)</strong> канал для конфиденциальности данных клиентов и операций.</p></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        <span>Почему бот не может публиковать в канал?</span>
+        <svg class="faq-chevron" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-answer">
+        <p>Проверьте три вещи:</p>
+        <ol><li>Бот добавлен как администратор канала</li><li>У бота есть права на публикацию сообщений</li><li>Chat_id канала введён правильно (со знаком <code>-</code>)</li></ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('export')">← Выгрузка</button>
+    <button class="nav-btn primary" onclick="showPage('glossary')">Глоссарий →</button>
+  </div>
+</div>
+
+
+<!-- ── ГЛОССАРИЙ ── -->
+<div id="page-glossary" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">05 — Справка</span>
+  <div class="page-title">Глоссарий</div>
+
+  <div class="glossary-list">
+    <div class="glossary-item"><div class="glossary-term">Виртуальный обменный пункт</div><div class="glossary-def">Отдельная изолированная база данных в боте для одного обменного бизнеса</div></div>
+    <div class="glossary-item"><div class="glossary-term">Базовая валюта</div><div class="glossary-def">Национальная валюта страны, в которой работает обменник (например, RUB для России)</div></div>
+    <div class="glossary-item"><div class="glossary-term">Торгуемая валюта</div><div class="glossary-def">Иностранная валюта, которую обменник покупает или продаёт</div></div>
+    <div class="glossary-item"><div class="glossary-term">Кросс-валютная пара</div><div class="glossary-def">Обмен двух иностранных валют, минуя базовую (например, EUR/USD)</div></div>
+    <div class="glossary-item"><div class="glossary-term">Котировка</div><div class="glossary-def">Курс покупки или продажи валюты, установленный обменником</div></div>
+    <div class="glossary-item"><div class="glossary-term">Номинал</div><div class="glossary-def">Достоинство купюры (например, 50, 100, 500)</div></div>
+    <div class="glossary-item"><div class="glossary-term">Кросс-курс</div><div class="glossary-def">Курс обмена между двумя иностранными валютами</div></div>
+    <div class="glossary-item"><div class="glossary-term">Chat_id</div><div class="glossary-def">Числовой идентификатор канала или группы в Telegram (начинается с «-» для каналов)</div></div>
+    <div class="glossary-item"><div class="glossary-term">Telegram ID</div><div class="glossary-def">Уникальный числовой идентификатор пользователя в Telegram (только цифры, без минуса)</div></div>
+    <div class="glossary-item"><div class="glossary-term">Спред</div><div class="glossary-def">Разница между курсом покупки и курсом продажи — маржа обменника</div></div>
+    <div class="glossary-item"><div class="glossary-term">Доплата клиента</div><div class="glossary-def">Дополнительная сумма в рублях при округлении суммы выдачи вверх</div></div>
+    <div class="glossary-item"><div class="glossary-term">Доплата офиса</div><div class="glossary-def">Дополнительная сумма в рублях, которую офис выплачивает клиенту при округлении вниз</div></div>
+  </div>
+
+  <div class="section-nav">
+    <button class="nav-btn" onclick="showPage('faq')">← FAQ</button>
+    <button class="nav-btn primary" onclick="showPage('support')">Поддержка →</button>
+  </div>
+</div>
+
+
+<!-- ── ПОДДЕРЖКА ── -->
+<div id="page-support" class="section-page">
+  <div class="back-nav"><span class="back-btn" onclick="showHome()">← Содержание</span></div>
+  <span class="page-num">05 — Справка</span>
+  <div class="page-title">Контакты и поддержка</div>
+
+  <p class="body-text">При возникновении вопросов или проблем свяжитесь с нами:</p>
+
+  <div class="support-card">
+    <div class="support-icon">📧</div>
+    <div><div class="support-label">Email</div><div class="support-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c6b5b3b6b6a9b4b286a3bea5aea7a8a1a3a2a3b5ada4a9b2e8a5a9ab">[email&#160;protected]</a></div></div>
+  </div>
+  <div class="support-card">
+    <div class="support-icon">💬</div>
+    <div><div class="support-label">Telegram</div><div class="support-value">@ExchangeDeskBotSupport</div></div>
+  </div>
+
+  <div class="footer" style="margin-top:32px;">
+    © 2026 Exchange Desk Bot. Руководство основано на реальной документации бота. Версия февраль 2026.
+  </div>
+
+  <div class="section-nav" style="border-top:none;margin-top:16px;">
+    <button class="nav-btn" onclick="showPage('glossary')">← Глоссарий</button>
+    <button class="nav-btn primary" onclick="showHome()">Содержание</button>
+  </div>
+</div>
+
+</div><!-- /wrapper -->
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobileNav" style="display:none;">
+  <button class="mbn-btn" onclick="showHome()" id="mbn-home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Содержание</span>
+  </button>
+  <button class="mbn-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" id="mbn-top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    <span>Наверх</span>
+  </button>
+</nav>
+
+<style>
+.mobile-bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  display: flex !important; align-items: center;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  padding: 6px 16px max(6px, env(safe-area-inset-bottom)) 16px;
+  gap: 8px; box-shadow: 0 -2px 16px rgba(37,99,235,0.08);
+}
+.mbn-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: none; border: none; cursor: pointer; padding: 6px;
+  color: var(--text-muted); font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px; font-weight: 600; border-radius: 10px;
+  transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.mbn-btn svg { width: 20px; height: 20px; }
+.mbn-btn:active { background: var(--accent-light); color: var(--accent); }
+.mbn-btn.active-page { color: var(--accent); }
+@media (min-width: 769px) { .mobile-bottom-nav { display: none !important; } }
+</style>
+
+<script>
+var _currentPage = null;
+
+function showPage(id) {
+  document.getElementById('home').style.display = 'none';
+  document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) {
+    page.classList.add('active');
+    _currentPage = id;
+  }
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  updateMobileNav(false);
+}
+
+function showHome() {
+  document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('home').style.display = 'block';
+  _currentPage = null;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  updateMobileNav(true);
+}
+
+function updateMobileNav(isHome) {
+  const homeBtn = document.getElementById('mbn-home');
+  if (homeBtn) {
+    homeBtn.classList.toggle('active-page', isHome);
+  }
+}
+
+function toggleFaq(el) {
+  const item = el.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// Show bottom nav only on mobile
+function initNav() {
+  if (window.innerWidth <= 768) {
+    document.getElementById('mobileNav').style.display = 'flex';
+  }
+}
+window.addEventListener('resize', function() {
+  const nav = document.getElementById('mobileNav');
+  if (window.innerWidth <= 768) {
+    nav.style.display = 'flex';
+  } else {
+    nav.style.display = 'none';
+  }
+});
+document.addEventListener('DOMContentLoaded', initNav);
+initNav();
+</script>
+</body>
+</html>
